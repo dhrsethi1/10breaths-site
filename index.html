@@ -3,32 +3,386 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>10 Breaths</title>
-<meta name="description" content="10 Breaths: a micro-meditation of ten breaths, and a kind community to share how it went.">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<title>10 Breaths · Join the beta</title>
+<meta name="description" content="Ten breaths. That's all it takes. Join the 10 Breaths beta for Android and iPhone.">
+<meta name="theme-color" content="#e8c7bc">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #e8c7bc; --card: #f6e9e4; --ink: #3b2a2c; --ink-soft: #6f5557; --accent: #a85e4c; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) { --bg: #241a1b; --card: #33262a; --ink: #f3e3dd; --ink-soft: #c9b1ab; --accent: #e0957f; }
-  }
+  :root { --bg: #e8c7bc; --ink: #3b2a2c; --ink-soft: #5e4645; --accent: #a85e4c; --accent-deep: #8e4c3d; --cream: #f6e9e4; --error: #8e3b2b; }
   * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--ink);
-         font: 400 17px/1.6 Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; padding: 16px; }
-  .card { background: var(--card); border-radius: 28px; padding: 40px 28px; max-width: 480px; width: 100%; text-align: center; }
-  .mark { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; }
-  .bar { width: 8px; height: 36px; border-radius: 4px; background: var(--ink); }
-  .ring { width: 34px; height: 34px; border-radius: 50%; border: 7px solid var(--accent); }
-  h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: -0.02em; font-weight: 700; }
-  p { margin: 0 0 18px; color: var(--ink-soft); }
-  a { color: var(--accent); font-weight: 600; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Manrope, system-ui, -apple-system, sans-serif; }
+  a { color: var(--ink); }
+  a:hover { color: var(--accent); }
+  button, input { font-family: inherit; }
+  input::placeholder { color: #8a7270; }
+  .page { min-height: 100vh; display: flex; flex-direction: column; }
+  .wrap { max-width: 1100px; width: 100%; margin: 0 auto; padding-left: 28px; padding-right: 28px; }
+
+  header { padding-top: 24px; padding-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .mark { display: flex; align-items: center; gap: 4px; }
+  .mark .bar { width: 4px; height: 26px; border-radius: 2px; background: var(--ink); }
+  .mark .ring { width: 26px; height: 26px; border-radius: 50%; border: 4px solid var(--accent); }
+  .brand-name { font-size: 20px; font-weight: 500; letter-spacing: -0.01em; }
+  .pill { height: 32px; padding: 0 14px; border-radius: 16px; background: rgba(255,255,255,.5); display: flex; align-items: center; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; }
+
+  .hero { flex: 1; padding-top: 8px; padding-bottom: 48px; display: flex; flex-direction: column; align-items: center; gap: 32px; }
+  .intro { max-width: 620px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+  .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.12em; color: var(--accent-deep); }
+  .intro h1 { margin: 0; font-size: clamp(38px, 5vw, 60px); line-height: 1.04; font-weight: 500; letter-spacing: -0.035em; text-wrap: balance; }
+  .intro p { margin: 0; font-size: 18px; line-height: 1.55; color: var(--ink-soft); text-wrap: pretty; }
+
+  /* The phone */
+  .device { flex: none; max-width: 100%; padding: 12px; border-radius: 62px; background: #241a1b; box-shadow: 0 40px 80px -30px rgba(59,42,44,.6), inset 0 0 0 2px #3d3031; }
+  .screen { position: relative; width: 390px; max-width: 100%; height: 844px; border-radius: 50px; overflow: hidden; background: var(--bg); display: flex; flex-direction: column; }
+  .statusbar { flex: none; height: 54px; padding: 0 30px; display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 600; position: relative; }
+  .island { position: absolute; left: 50%; top: 11px; width: 122px; height: 34px; margin-left: -61px; border-radius: 17px; background: #111; }
+  .status-icons { display: flex; align-items: center; gap: 6px; }
+  .home-indicator { flex: none; height: 5px; width: 134px; border-radius: 3px; background: var(--ink); margin: 0 auto 8px; }
+  main { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 24px 32px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* On a phone, the page is the phone: drop the frame. */
+  @media (max-width: 480px) {
+    .wrap { padding-left: 16px; padding-right: 16px; }
+    .device { padding: 0; border-radius: 0; background: transparent; box-shadow: none; width: 100%; }
+    .screen { width: 100%; height: auto; border-radius: 24px; background: rgba(255,255,255,.18); }
+    .statusbar, .home-indicator { display: none; }
+    main { padding: 20px 16px 24px; overflow: visible; }
+  }
+
+  .progress-row { display: flex; flex-direction: column; gap: 10px; }
+  .progress-top { display: flex; align-items: center; justify-content: space-between; min-height: 33px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+  .back { border: none; background: transparent; padding: 8px 0; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .track { height: 4px; border-radius: 2px; background: rgba(59,42,44,.15); }
+  .fill { height: 100%; border-radius: 2px; background: var(--ink); transition: width .4s; }
+
+  h2 { margin: 0; font-size: 29px; line-height: 1.12; font-weight: 500; letter-spacing: -0.025em; text-wrap: balance; }
+  .lead { margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink-soft); text-wrap: pretty; }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+  .heading { display: flex; flex-direction: column; gap: 8px; }
+  .heading.tall { gap: 12px; }
+
+  .choice { min-height: 56px; border: none; border-radius: 16px; padding: 0 18px 0 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 16px; font-weight: 500; cursor: pointer; text-align: left; background: rgba(255,255,255,.55); color: var(--ink); transition: background .2s, color .2s; }
+  .choice.big { min-height: 72px; padding: 14px 18px; border-radius: 18px; }
+  .choice[aria-checked="true"] { background: var(--ink); color: var(--cream); }
+  .choice .title { font-size: 18px; font-weight: 600; display: block; }
+  .choice .sub { font-size: 13px; opacity: .75; display: block; margin-top: 3px; }
+  .tick { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; opacity: .35; }
+  .tick span { opacity: 0; }
+  .choice[aria-checked="true"] .tick { opacity: 1; }
+  .choice[aria-checked="true"] .tick span { opacity: 1; }
+  .choice:focus-visible, .cta:focus-visible, .link:focus-visible, .back:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  label { font-size: 14px; font-weight: 600; }
+  .email { height: 60px; width: 100%; border-radius: 16px; border: 2px solid transparent; background: rgba(255,255,255,.7); padding: 0 18px; font-size: 17px; font-weight: 500; color: var(--ink); outline: none; }
+  .email:focus { border-color: var(--accent); }
+  .email.invalid { border-color: var(--error); }
+  .error { font-size: 14px; font-weight: 600; color: var(--error); }
+  .note { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); }
+
+  .actions { display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 4px; }
+  .cta { width: 100%; height: 58px; border: none; border-radius: 29px; background: var(--ink); color: var(--cream); font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity .2s; }
+  .cta[aria-disabled="true"] { opacity: .4; cursor: default; }
+  .link { border: none; background: transparent; padding: 8px 12px; font-size: 14px; font-weight: 600; color: var(--ink-soft); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+  .done { display: flex; flex-direction: column; gap: 28px; padding-top: 24px; }
+  .big-mark { display: flex; align-items: center; gap: 10px; }
+  .big-mark .bar { width: 8px; height: 64px; border-radius: 4px; background: var(--ink); }
+  .big-mark .ring { width: 64px; height: 64px; border-radius: 50%; border: 8px solid var(--accent); }
+  .done h2 { font-size: 32px; line-height: 1.1; outline: none; }
+  .done .lead { font-size: 17px; }
+  .summary { border-radius: 20px; background: rgba(255,255,255,.55); }
+  .summary div { display: flex; justify-content: space-between; gap: 16px; padding: 14px 18px; border-top: 1px solid rgba(59,42,44,.08); font-size: 15px; }
+  .summary div:first-child { border-top: none; }
+  .summary span:first-child { color: var(--ink-soft); }
+  .summary span:last-child { font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+  .wait { padding: 20px; border-radius: 20px; background: var(--ink); color: var(--cream); display: flex; flex-direction: column; gap: 6px; }
+  .wait b { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; color: var(--bg); }
+  .wait span { font-size: 17px; line-height: 1.5; text-wrap: pretty; }
+
+  .honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  footer { padding-top: 20px; padding-bottom: 28px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--ink-soft); }
+  footer nav { display: flex; gap: 18px; }
+  [hidden] { display: none !important; }
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="mark" aria-hidden="true"><span class="bar"></span><span class="ring"></span></div>
-  <h1>10 Breaths</h1>
-  <p>A micro-meditation of ten breaths to shift how you feel, and a kind community to share how it went.</p>
-  <a href="/privacypolicy/">Privacy Policy</a> · <a href="/delete-account/">Delete your account</a>
+<div class="page">
+  <header class="wrap">
+    <a class="brand" href="/" aria-label="10 Breaths home">
+      <span class="mark" aria-hidden="true"><span class="bar"></span><span class="ring"></span></span>
+      <span class="brand-name">breaths</span>
+    </a>
+    <span class="pill">BETA</span>
+  </header>
+
+  <div class="hero wrap">
+    <div class="intro">
+      <div class="eyebrow">BETA FOR ANDROID &amp; IPHONE</div>
+      <h1>Ten breaths. That's all it takes.</h1>
+      <p>Answer three quick questions on the phone below to join the beta. It takes under a minute.</p>
+    </div>
+
+    <div class="device">
+      <div class="screen">
+        <div class="statusbar" aria-hidden="true">
+          <span>9:41</span>
+          <span class="island"></span>
+          <span class="status-icons">
+            <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="1" fill="#3b2a2c"/><rect x="4.5" y="5" width="3" height="6" rx="1" fill="#3b2a2c"/><rect x="9" y="2.5" width="3" height="8.5" rx="1" fill="#3b2a2c"/><rect x="13.5" y="0" width="3" height="11" rx="1" fill="#3b2a2c"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="#3b2a2c" opacity=".5"/><rect x="2" y="2" width="17" height="8" rx="2" fill="#3b2a2c"/><rect x="23" y="4" width="1.5" height="4" rx=".75" fill="#3b2a2c" opacity=".5"/></svg>
+          </span>
+        </div>
+
+        <main id="main">
+          <form id="flow" novalidate>
+            <div class="stack" style="gap:24px">
+              <div class="progress-row">
+                <div class="progress-top">
+                  <span id="step-text">Step 1 of 3</span>
+                  <button type="button" class="back" id="back" hidden>
+                    <svg width="8" height="12" viewBox="0 0 10 16" aria-hidden="true"><path d="M8 2L2 8l6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Back
+                  </button>
+                </div>
+                <div class="track" role="progressbar" aria-label="Progress" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1"><div class="fill" id="fill" style="width:33.3%"></div></div>
+              </div>
+
+              <!-- Step 1 -->
+              <section data-step="0" class="stack" style="gap:24px">
+                <div class="heading"><h2 id="q-hear">How did you hear about 10 breaths?</h2></div>
+                <div class="stack" role="radiogroup" aria-labelledby="q-hear" data-key="heard"></div>
+              </section>
+
+              <!-- Step 2 -->
+              <section data-step="1" class="stack" style="gap:24px" hidden>
+                <div class="heading tall">
+                  <div class="eyebrow">WELCOME TO THE BETA</div>
+                  <h2>Be one of the first to try 10 breaths.</h2>
+                  <p class="lead">We're inviting a small group to test the app on Android and iPhone. Leave your email and we'll send your invite when it's ready.</p>
+                </div>
+                <div class="stack" style="gap:8px">
+                  <label for="email">Email address</label>
+                  <input class="email" id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" aria-describedby="email-error email-note">
+                  <span class="error" id="email-error" hidden>Please enter a valid email address.</span>
+                  <span class="note" id="email-note">
+                    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="#5e4645" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="#5e4645" stroke-width="1.5"/></svg>
+                    We'll only use it for beta invites and updates. No spam.
+                  </span>
+                </div>
+              </section>
+
+              <!-- Step 3 -->
+              <section data-step="2" class="stack" style="gap:24px" hidden>
+                <div class="heading">
+                  <h2 id="q-phone">What type of phone do you have?</h2>
+                  <p class="lead">So we send you the right beta invite.</p>
+                </div>
+                <div class="stack" role="radiogroup" aria-labelledby="q-phone" data-key="phone"></div>
+              </section>
+
+              <!-- Bots fill this in; people never see it. -->
+              <div class="honeypot" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+
+              <span class="error" id="submit-error" role="alert" hidden></span>
+              <div class="actions">
+                <button type="submit" class="cta" id="next">Continue</button>
+              </div>
+            </div>
+          </form>
+
+          <section class="done" id="done" hidden aria-live="polite">
+            <div class="big-mark" aria-hidden="true"><span class="bar"></span><span class="ring"></span></div>
+            <div class="heading tall">
+              <h2 id="done-title" tabindex="-1">You're on the beta list.</h2>
+              <p class="lead" id="done-text"></p>
+            </div>
+            <div class="summary" id="summary"></div>
+            <div class="wait">
+              <b>WHILE YOU WAIT</b>
+              <span>Try it now. Breathe in and out in a relaxed manner for 10 seconds. Do that ten times.</span>
+            </div>
+            <button type="button" class="link" id="edit" style="align-self:center">Edit my answers</button>
+          </section>
+        </main>
+        <div class="home-indicator" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="wrap">
+    <span>© 2026 10 breaths</span>
+    <nav><a href="/privacypolicy/">Privacy</a><a href="/delete-account/">Delete account</a></nav>
+  </footer>
 </div>
+
+<script>
+(function () {
+  // Sign-ups are saved and emailed to the team by a Supabase edge function (beta-signup).
+  var ENDPOINT = 'https://dgjkomdjrjbdfwybkswr.supabase.co/functions/v1/beta-signup';
+  var KEY = '10b-beta-signup';
+  var STEPS = ['heard', 'email', 'phone'];
+  var OPTIONS = {
+    heard: [['App Store or Google Play'], ['Instagram'], ['TikTok'], ['A friend or family member'], ['Podcast'], ['Search engine'], ['Somewhere else']],
+    phone: [['iPhone', 'iOS · via TestFlight'], ['Android', 'via Google Play'], ['I use both', 'iPhone and Android']]
+  };
+
+  // Answers survive a reload on this device (best effort: storage can be unavailable).
+  var state = { step: 0, a: { heard: null, email: '', phone: null }, done: false };
+  try { var saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved && saved.a) state = saved; } catch (e) {}
+  function persist() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var emailInput = $('email');
+  var emailTouched = false;
+  var sending = false;
+
+  function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((e || '').trim()); }
+  function ok(i) { var k = STEPS[i]; return k === 'email' ? validEmail(state.a.email) : !!state.a[k]; }
+
+  function buildChoices(key) {
+    var group = document.querySelector('[data-key="' + key + '"]');
+    OPTIONS[key].forEach(function (o) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'choice' + (o[1] ? ' big' : '');
+      b.setAttribute('role', 'radio');
+      b.dataset.value = o[0];
+      var text = document.createElement('span');
+      if (o[1]) {
+        var t = document.createElement('span'); t.className = 'title'; t.textContent = o[0];
+        var s = document.createElement('span'); s.className = 'sub'; s.textContent = o[1];
+        text.appendChild(t); text.appendChild(s);
+      } else {
+        text.textContent = o[0];
+      }
+      var tick = document.createElement('span');
+      tick.className = 'tick';
+      tick.setAttribute('aria-hidden', 'true');
+      tick.innerHTML = '<span>✓</span>';
+      b.appendChild(text);
+      b.appendChild(tick);
+      b.addEventListener('click', function () {
+        state.a[key] = state.a[key] === o[0] ? null : o[0];
+        persist();
+        render();
+      });
+      group.appendChild(b);
+    });
+  }
+
+  function render() {
+    var n = STEPS.length, step = state.step;
+    $('flow').hidden = state.done;
+    $('done').hidden = !state.done;
+    if (state.done) return renderDone();
+
+    document.querySelectorAll('[data-step]').forEach(function (s) { s.hidden = Number(s.dataset.step) !== step; });
+    $('step-text').textContent = 'Step ' + (step + 1) + ' of ' + n;
+    $('fill').style.width = ((step + 1) / n * 100) + '%';
+    document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', step + 1);
+    $('back').hidden = step === 0;
+
+    ['heard', 'phone'].forEach(function (key) {
+      document.querySelectorAll('[data-key="' + key + '"] .choice').forEach(function (b) {
+        b.setAttribute('aria-checked', String(state.a[key] === b.dataset.value));
+      });
+    });
+
+    var bad = emailTouched && !validEmail(state.a.email);
+    emailInput.classList.toggle('invalid', bad);
+    emailInput.setAttribute('aria-invalid', String(bad));
+    $('email-error').hidden = !bad;
+
+    var next = $('next');
+    next.textContent = sending ? 'Joining…' : step === n - 1 ? 'Join the beta' : step === 1 ? 'Count me in' : 'Continue';
+    next.setAttribute('aria-disabled', String(sending || (!ok(step) && step !== 1)));
+  }
+
+  function renderDone() {
+    var a = state.a;
+    var via = a.phone === 'iPhone' ? 'TestFlight' : a.phone === 'Android' ? 'Google Play' : 'TestFlight and Google Play';
+    $('done-text').textContent = "Thank you. We'll email " + (a.email || 'you') + ' when your invite is ready, with a link to install the beta through ' + via + '.';
+    var summary = $('summary');
+    summary.innerHTML = '';
+    [['Heard about us', a.heard], ['Email', a.email], ['Phone', a.phone]].forEach(function (r) {
+      var row = document.createElement('div');
+      var k = document.createElement('span'); k.textContent = r[0];
+      var v = document.createElement('span'); v.textContent = r[1] || '—';
+      row.appendChild(k); row.appendChild(v); summary.appendChild(row);
+    });
+  }
+
+  function scrollTop() { var m = $('main'); if (m) m.scrollTop = 0; }
+
+  function submit() {
+    sending = true;
+    $('submit-error').hidden = true;
+    render();
+    fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ heard: state.a.heard, email: state.a.email.trim(), phone: state.a.phone, website: $('website').value })
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (body) {
+        if (!res.ok) throw new Error(body.error || 'Something went wrong.');
+      });
+    }).then(function () {
+      sending = false;
+      state.done = true;
+      persist();
+      render();
+      scrollTop();
+      $('done-title').focus();
+    }).catch(function (e) {
+      sending = false;
+      var msg = e && e.message && e.message !== 'Failed to fetch' && e.message !== 'Load failed' ? e.message : "Couldn't reach us.";
+      $('submit-error').textContent = msg + ' Please try again.';
+      $('submit-error').hidden = false;
+      render();
+    });
+  }
+
+  $('flow').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (sending) return;
+    var i = state.step;
+    if (i === 1 && !ok(1)) { emailTouched = true; render(); emailInput.focus(); return; }
+    if (!ok(i)) return;
+    if (i === STEPS.length - 1) return submit();
+    state.step = i + 1;
+    persist();
+    render();
+    scrollTop();
+    if (state.step === 1) emailInput.focus();
+  });
+
+  $('back').addEventListener('click', function () {
+    state.step = Math.max(0, state.step - 1);
+    $('submit-error').hidden = true;
+    persist();
+    render();
+  });
+
+  emailInput.value = state.a.email || '';
+  emailInput.addEventListener('input', function () { state.a.email = emailInput.value; persist(); render(); });
+  emailInput.addEventListener('blur', function () { if (state.a.email) { emailTouched = true; render(); } });
+
+  $('edit').addEventListener('click', function () {
+    state.done = false;
+    state.step = 0;
+    emailTouched = false;
+    persist();
+    render();
+    scrollTop();
+  });
+
+  buildChoices('heard');
+  buildChoices('phone');
+  if (state.step > 2) state.step = 2;
+  render();
+})();
+</script>
 </body>
 </html>
